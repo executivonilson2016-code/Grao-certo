@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="GrãoCerto - Classificador Digital de Grãos com IA baseado nas normas oficiais do MAPA. LORD Serviços e Treinamentos.">
+<meta name="theme-color" content="#1a4731">
+<title>GrãoCerto — Classificador Digital de Grãos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --v1:#1a4731;--v2:#2d6a4f;--v3:#52b788;--vp:#d8f3dc;--vf:#f0faf2;
+  --al:#1a3a5c;--ou:#c9960c;--op:#fef6e4;--ol:#f4d03f;
+  --bg:#faf8f3;--be:#f0ebe0;--b2:#e8e0d0;
+  --c1:#1e1e1c;--c2:#4a4a46;--c3:#8a8a84;--c4:#d0cfc8;--wh:#ffffff;
+  --tr:all .22s cubic-bezier(.4,0,.2,1);
+}
+[data-dark="1"]{--bg:#131512;--be:#1e2420;--b2:#2a3330;--wh:#1a2320;--c1:#e8ede8;--c2:#9aada0;--c3:#5a7068;--c4:#2a3330;--vp:#0d2418;--vf:#0d2418;--op:#1e1a0a;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--c1);min-height:100vh;transition:background .3s,color .3s}
+
+.onboard{position:fixed;inset:0;background:var(--v1);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;transition:opacity .4s,transform .4s}
+.onboard.hidden{opacity:0;transform:translateY(-20px);pointer-events:none}
+.ob-title{font-family:'Fraunces',serif;font-weight:900;font-size:2rem;color:white;margin-bottom:.5rem}
+.ob-title span{color:var(--ol)}
+.ob-sub{font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;margin-bottom:1.5rem;max-width:280px}
+.ob-steps{display:flex;flex-direction:column;gap:8px;width:100%;max-width:300px;margin-bottom:1.5rem}
+.ob-step{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:10px;text-align:left}
+.ob-si{font-size:1.2rem;flex-shrink:0}
+.ob-st{font-size:11.5px;color:rgba(255,255,255,.8);line-height:1.4}
+.ob-st strong{color:white;display:block;font-size:12px}
+.ob-btn{background:var(--ol);color:var(--v1);border:none;border-radius:10px;padding:12px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Fraunces',serif;width:100%;max-width:300px;transition:var(--tr)}
+.ob-btn:hover{background:#ffe066;transform:translateY(-1px)}
+
+.header{background:var(--v1);padding:0 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;height:54px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo-wrap{display:flex;align-items:center;gap:8px}
+.logo-text{font-family:'Fraunces',serif;font-weight:900;font-size:1.05rem;color:white;letter-spacing:-.02em;line-height:1}
+.logo-text span{color:var(--ol)}
+.logo-sub{font-size:8px;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:5px}
+.ia-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);font-size:9.5px;padding:3px 8px;border-radius:20px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:4px}
+.pulse{width:5px;height:5px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.dark-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;transition:var(--tr)}
+
+.tabs{background:var(--wh);border-bottom:1px solid var(--b2);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:54px;z-index:99;transition:background .3s}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:.6rem .85rem;font-size:11px;font-weight:500;color:var(--c3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:var(--tr)}
+.tab.active{color:var(--v2);border-bottom-color:var(--v2);font-weight:600}
+
+.view{display:none;padding:.9rem;max-width:680px;margin:0 auto;padding-bottom:2rem;animation:fadeUp .28s ease}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+.counter-bar{background:var(--op);border:1px solid #e8c96a;border-radius:9px;padding:7px 11px;font-size:11px;color:#7a5c0a;margin-bottom:.9rem;display:flex;align-items:center;justify-content:space-between}
+[data-dark="1"] .counter-bar{color:#c9a050}
+.uplink{color:var(--v2);font-weight:600;cursor:pointer;font-size:11px;text-decoration:underline;text-underline-offset:2px}
+.slabel{font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--c3);margin-bottom:6px}
+.stitle{font-family:'Fraunces',serif;font-weight:700;font-size:1.05rem;color:var(--c1);margin-bottom:.35rem}
+.ssub{font-size:12px;color:var(--c2);margin-bottom:.9rem;line-height:1.65}
+
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.cc{background:var(--wh);border:1.5px solid var(--b2);border-radius:11px;padding:.75rem .85rem;cursor:pointer;transition:var(--tr);position:relative}
+.cc:hover{border-color:var(--v3);transform:translateY(-1px)}
+.cc.sel{border-color:var(--v2);background:var(--vf)}
+.cc-em{font-size:1.4rem;margin-bottom:3px}
+.cc-nm{font-family:'Fraunces',serif;font-weight:700;font-size:.85rem;color:var(--c1)}
+.cc-nr{font-size:9.5px;color:var(--c3);margin-top:1px}
+.cc-dot{width:6px;height:6px;border-radius:50%;background:var(--v2);position:absolute;top:7px;right:7px;display:none}
+.cc.sel .cc-dot{display:block}
+
+.qbtns{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.qb{background:var(--wh);border:1.5px solid var(--b2);border-radius:20px;padding:4px 10px;font-size:10.5px;cursor:pointer;color:var(--c2);transition:var(--tr)}
+.qb:hover{border-color:var(--v3);color:var(--v2);background:var(--vf)}
+
+.chat-area{background:var(--wh);border:1px solid var(--b2);border-radius:12px;min-height:220px;max-height:320px;overflow-y:auto;padding:.8rem;display:flex;flex-direction:column;gap:7px;margin-bottom:7px;transition:background .3s}
+.msg{max-width:90%;padding:7px 11px;border-radius:10px;font-size:12px;line-height:1.65}
+.msg.bot{background:var(--bg);border:1px solid var(--b2);align-self:flex-start;border-bottom-left-radius:3px}
+.msg.user{background:var(--v2);color:white;align-self:flex-end;border-bottom-right-radius:3px}
+.msg.bot strong{color:var(--v2)}
+.tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:5px;margin:1px 2px;font-weight:500}
+.tt{background:var(--op);color:#7a5c0a}.tg{background:#fde8e8;color:#b71c1c}.tl{background:#e8f5e9;color:#1b5e20}.td{background:#fce4ec;color:#880e4f}
+.typing{display:flex;align-items:center;gap:4px;padding:7px 11px;background:var(--bg);border:1px solid var(--b2);border-radius:10px;align-self:flex-start;width:52px}
+.typing span{width:4px;height:4px;border-radius:50%;background:var(--c3);animation:tda 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes tda{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+.irow{display:flex;gap:6px;align-items:flex-end}
+.ci{flex:1;padding:7px 11px;border:1.5px solid var(--b2);border-radius:9px;font-size:12px;font-family:'DM Sans',sans-serif;resize:none;min-height:36px;max-height:95px;outline:none;transition:border-color .2s;color:var(--c1);background:var(--wh)}
+.ci:focus{border-color:var(--v3)}
+.bs{background:var(--v2);color:white;border:none;border-radius:9px;padding:7px 13px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:var(--tr);height:36px}
+.bs:hover{background:var(--v1)}.bs:disabled{background:var(--c4);cursor:not-allowed;color:var(--c3)}
+
+.upzone{border:2px dashed var(--b2);border-radius:11px;padding:1.1rem;text-align:center;cursor:pointer;transition:var(--tr);background:var(--wh);margin-bottom:.8rem}
+.upzone:hover{border-color:var(--v3);background:var(--vf)}
+.upzone input{display:none}
+.prev-img{max-width:100%;max-height:160px;border-radius:8px;margin:6px 0;display:block;border:1px solid var(--b2)}
+
+.fcard{background:var(--wh);border:1px solid var(--b2);border-radius:12px;padding:.9rem;margin-bottom:.9rem;transition:background .3s}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.fg label{font-size:10px;color:var(--c3);display:block;margin-bottom:2px;font-weight:500}
+.fg input,.fg select{width:100%;padding:6px 9px;border:1.5px solid var(--b2);border-radius:7px;font-size:12px;outline:none;font-family:'DM Sans',sans-serif;color:var(--c1);background:var(--wh);transition:border-color .2s}
+.fg input:focus,.fg select:focus{border-color:var(--v3)}
+.ff{grid-column:1/-1}
+
+.rcard{background:var(--wh);border:1px solid var(--b2);border-radius:12px;padding:.9rem;animation:fadeUp .3s ease;transition:background .3s}
+.rtipo{font-family:'Fraunces',serif;font-weight:900;font-size:1.2rem;line-height:1.1;margin:4px 0 9px}
+.rbar-item{margin-bottom:6px}
+.rbar-label{display:flex;justify-content:space-between;font-size:10.5px;color:var(--c2);margin-bottom:2px}
+.rbar-track{background:var(--be);border-radius:3px;height:6px;overflow:hidden}
+.rbar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.rbar-fill.ok{background:var(--v3)}.rbar-fill.warn{background:#f4d03f}.rbar-fill.bad{background:#e74c3c}
+.btn-copy{background:var(--vf);color:var(--v2);border:1.5px solid var(--vp);border-radius:7px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:var(--tr);margin-top:7px;display:flex;align-items:center;gap:4px}
+.btn-copy:hover{background:var(--vp)}
+.aviso{background:var(--op);border:1px solid #e8c96a;border-radius:6px;padding:6px 9px;font-size:10.5px;color:#7a5c0a;margin-top:6px;line-height:1.6}
+[data-dark="1"] .aviso{color:#c9a050}
+
+.modo-toggle{display:flex;background:var(--be);border-radius:20px;padding:2px;margin-bottom:.85rem;width:fit-content}
+.mt-btn{padding:4px 12px;border-radius:18px;font-size:10.5px;cursor:pointer;border:none;background:transparent;color:var(--c3);font-family:'DM Sans',sans-serif;font-weight:500;transition:var(--tr)}
+.mt-btn.active{background:var(--v2);color:white;font-weight:600}
+
+.calc-card{background:var(--wh);border:1px solid var(--b2);border-radius:12px;padding:.9rem;margin-bottom:.9rem;transition:background .3s}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.calc-field label{font-size:10px;color:var(--c3);display:block;margin-bottom:2px;font-weight:500}
+.calc-field input,.calc-field select{width:100%;padding:6px 9px;border:1.5px solid var(--b2);border-radius:7px;font-size:12px;outline:none;font-family:'DM Sans',sans-serif;color:var(--c1);background:var(--wh);transition:border-color .2s}
+.calc-field input:focus{border-color:var(--v3)}
+.calc-btn{width:100%;margin-top:10px;padding:8px;background:var(--v2);color:white;border:none;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:var(--tr)}
+.calc-btn:hover{background:var(--v1)}
+.calc-result{background:var(--vf);border:1px solid var(--vp);border-radius:9px;padding:.9rem;margin-top:.8rem;display:none;animation:fadeUp .3s ease}
+.calc-result-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--b2);font-size:12px}
+.calc-result-row:last-child{border-bottom:none;font-weight:600;font-size:12.5px;padding-top:7px;color:var(--v2)}
+.calc-result-label{color:var(--c2)}
+.calc-result-val{font-weight:600;color:var(--c1)}
+.desc-item{color:#b71c1c}
+
+.ref-tabs{display:flex;gap:5px;margin-bottom:.9rem;flex-wrap:wrap}
+.ref-tab{padding:4px 11px;border-radius:20px;font-size:11px;cursor:pointer;border:1.5px solid var(--b2);background:var(--wh);color:var(--c2);transition:var(--tr);font-family:'DM Sans',sans-serif;font-weight:500}
+.ref-tab.active{background:var(--v2);color:white;border-color:var(--v2)}
+.ref-content{display:none}
+.ref-content.active{display:block;animation:fadeUp .25s ease}
+.ref-table{width:100%;border-collapse:collapse;font-size:11px}
+.ref-table th{background:var(--v2);color:white;padding:6px 8px;text-align:left;font-weight:600;font-size:10.5px}
+.ref-table th:first-child{border-radius:6px 0 0 0}.ref-table th:last-child{border-radius:0 6px 0 0}
+.ref-table td{padding:5px 8px;border-bottom:1px solid var(--b2);color:var(--c2);vertical-align:middle;font-size:11px}
+.ref-table tr:last-child td{border-bottom:none}
+.ref-table tr:hover td{background:var(--vf)}
+.badge-tipo{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.b1{background:#e8f5e9;color:#1b5e20}.b2{background:#fff8e1;color:#e65100}.b3{background:#fde8e8;color:#b71c1c}.bf{background:#fce4ec;color:#880e4f}
+.ref-note{font-size:10.5px;color:var(--c3);margin-top:.6rem;line-height:1.6;padding:6px 9px;background:var(--be);border-radius:6px}
+.defects-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.defect-card{background:var(--wh);border:1px solid var(--b2);border-radius:9px;padding:.7rem}
+.defect-nome{font-weight:600;font-size:11.5px;color:var(--c1);margin-bottom:2px}
+.defect-tipo{font-size:9.5px;padding:1px 6px;border-radius:4px;display:inline-block;margin-bottom:3px;font-weight:600}
+.dt-grave{background:#fde8e8;color:#b71c1c}.dt-leve{background:#e8f5e9;color:#1b5e20}
+.defect-desc{font-size:10.5px;color:var(--c3);line-height:1.5}
+
+.gloss-search{width:100%;padding:8px 12px;border:1.5px solid var(--b2);border-radius:9px;font-size:12.5px;outline:none;font-family:'DM Sans',sans-serif;color:var(--c1);background:var(--wh);margin-bottom:.9rem;transition:border-color .2s}
+.gloss-search:focus{border-color:var(--v3)}
+.gloss-item{background:var(--wh);border:1px solid var(--b2);border-radius:10px;padding:.8rem;margin-bottom:.6rem;transition:var(--tr);cursor:pointer}
+.gloss-item:hover{border-color:var(--v3);background:var(--vf)}
+.gloss-item.open .gloss-def{display:block}
+.gloss-header{display:flex;align-items:center;justify-content:space-between}
+.gloss-termo{font-family:'Fraunces',serif;font-weight:700;font-size:.88rem;color:var(--c1)}
+.gloss-cat{font-size:9.5px;padding:2px 7px;border-radius:5px;font-weight:600}
+.gc-norma{background:var(--vp);color:var(--v2)}.gc-defeito{background:#fde8e8;color:#b71c1c}
+.gc-processo{background:var(--op);color:#7a5c0a}.gc-qualidade{background:#e8f0fd;color:#1a3a5c}
+.gloss-def{display:none;margin-top:8px;font-size:11.5px;color:var(--c2);line-height:1.7;padding-top:8px;border-top:1px solid var(--b2)}
+.gloss-def em{color:var(--v2);font-style:normal;font-weight:600}
+.gloss-arrow{font-size:10px;color:var(--c3);transition:var(--tr)}
+.gloss-item.open .gloss-arrow{transform:rotate(90deg)}
+.gloss-empty{text-align:center;padding:2rem;color:var(--c3);font-size:12.5px}
+
+.faq-item{background:var(--wh);border:1px solid var(--b2);border-radius:10px;padding:.8rem;margin-bottom:.6rem;transition:var(--tr);cursor:pointer}
+.faq-item:hover{border-color:var(--v3)}
+.faq-item.open .faq-resp{display:block}
+.faq-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.faq-q{font-size:12.5px;font-weight:600;color:var(--c1);line-height:1.5;flex:1}
+.faq-arrow{font-size:10px;color:var(--c3);transition:var(--tr);flex-shrink:0;margin-top:2px}
+.faq-item.open .faq-arrow{transform:rotate(90deg)}
+.faq-resp{display:none;margin-top:8px;font-size:11.5px;color:var(--c2);line-height:1.75;padding-top:8px;border-top:1px solid var(--b2)}
+.faq-resp strong{color:var(--v2)}
+.faq-cat{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.8rem}
+.faq-cat-btn{padding:4px 11px;border-radius:20px;font-size:10.5px;cursor:pointer;border:1.5px solid var(--b2);background:var(--wh);color:var(--c2);transition:var(--tr);font-family:'DM Sans',sans-serif}
+.faq-cat-btn.active{background:var(--v2);color:white;border-color:var(--v2)}
+
+.hist-empty{text-align:center;padding:2rem 1rem;color:var(--c3);font-size:12.5px}
+.hist-item{background:var(--wh);border:1px solid var(--b2);border-radius:10px;padding:.8rem .9rem;margin-bottom:.6rem;transition:var(--tr);animation:fadeUp .25s ease}
+.hist-item:hover{border-color:var(--v3);background:var(--vf)}
+.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.hist-cultura{font-family:'Fraunces',serif;font-weight:700;font-size:.85rem;color:var(--c1)}
+.hist-time{font-size:10px;color:var(--c3)}
+.hist-tipo{font-size:11.5px;font-weight:600}
+.hist-preview{font-size:10.5px;color:var(--c3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-clear{background:none;border:1px solid var(--b2);border-radius:7px;padding:4px 11px;font-size:11px;color:var(--c3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:var(--tr)}
+.hist-clear:hover{border-color:#e74c3c;color:#e74c3c}
+
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:1rem 0}
+.pc{background:var(--wh);border:1px solid var(--b2);border-radius:10px;padding:.8rem;transition:background .3s}
+.pc.dest{border-color:var(--v2);background:var(--vf)}
+.pc-nm{font-family:'Fraunces',serif;font-weight:700;font-size:.82rem;margin-bottom:3px;color:var(--c1)}
+.pc-pr{font-family:'Fraunces',serif;font-weight:900;font-size:1.25rem;color:var(--v2);line-height:1}
+.pc-pr small{font-family:'DM Sans',sans-serif;font-size:9.5px;font-weight:400;color:var(--c3)}
+.pc-ft{font-size:10px;color:var(--c3);margin-top:5px;line-height:1.7}
+.pc-ft li{list-style:none;padding-left:12px;position:relative}
+.pc-ft li::before{content:"✓";position:absolute;left:0;color:var(--v3);font-weight:700}
+.pbdg{background:var(--v2);color:white;font-size:8.5px;padding:2px 6px;border-radius:8px;display:inline-block;margin-bottom:3px;font-weight:600}
+.btp{background:var(--v2);color:white;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:var(--tr);width:100%;margin-top:7px}
+.btp:hover{background:var(--v1)}
+.bto{background:var(--wh);color:var(--v2);border:2px solid var(--v2);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:5px}
+.divider{height:1px;background:var(--b2);margin:.8rem 0}
+.emp-card{background:var(--vf);border:1px solid var(--v3);border-radius:10px;padding:.85rem;margin-top:.6rem}
+.fl{background:var(--wh);border:1px solid var(--b2);border-radius:11px;padding:.8rem .9rem;display:flex;align-items:center;gap:10px;margin-top:.9rem;transition:background .3s}
+.fl-dev{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--c3)}
+.fl-emp{font-family:'Fraunces',serif;font-weight:700;font-size:.88rem;color:var(--al)}
+[data-dark="1"] .fl-emp{color:#7ab4e8}
+.fl-aut{font-size:10.5px;color:var(--c2)}
+.scard{background:var(--wh);border:1px solid var(--b2);border-radius:12px;padding:.9rem;margin-top:.6rem;transition:background .3s}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.mo-box{background:var(--wh);border-radius:14px;padding:1.3rem;max-width:290px;width:90%;margin:1rem}
+.mo-title{font-family:'Fraunces',serif;font-weight:900;font-size:1rem;margin-bottom:.3rem;color:var(--c1)}
+.mo-x{float:right;cursor:pointer;font-size:.95rem;color:var(--c3)}
+</style>
+</head>
+<body>
+
+<div class="onboard" id="onboard">
+  <div style="margin-bottom:1rem"><svg width="52" height="52" viewBox="0 0 52 52" fill="none"><rect x="4" y="26" width="20" height="20" rx="2.5" fill="#95d5b2" transform="rotate(-15 4 26)"/><rect x="15" y="16" width="20" height="20" rx="2.5" fill="#74c69d" transform="rotate(-15 15 16)"/><rect x="26" y="7" width="20" height="20" rx="2.5" fill="#d8f3dc" transform="rotate(-15 26 7)"/></svg></div>
+  <div class="ob-title">Grão<span>Certo</span></div>
+  <div class="ob-sub">Classificador Digital com IA — Normas Oficiais do MAPA</div>
+  <div class="ob-steps">
+    <div class="ob-step"><div class="ob-si">💬</div><div class="ob-st"><strong>Consulta com IA</strong>5 culturas com normas oficiais</div></div>
+    <div class="ob-step"><div class="ob-si">🧮</div><div class="ob-st"><strong>Calculadora de Desconto</strong>Umidade, impurezas e defeitos</div></div>
+    <div class="ob-step"><div class="ob-si">📖</div><div class="ob-st"><strong>Glossário + FAQ</strong>Termos técnicos e dúvidas comuns</div></div>
+    <div class="ob-step"><div class="ob-si">📋</div><div class="ob-st"><strong>Tabelas de Referência</strong>Limites oficiais por cultura</div></div>
+  </div>
+  <button class="ob-btn" onclick="startApp()">Começar →</button>
+  <div style="font-size:9.5px;color:rgba(255,255,255,.35);margin-top:10px">LORD Serviços e Treinamentos • Nilson Andrade • v3.0</div>
+</div>
+
+<div class="header">
+  <div class="logo-wrap">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="1" y="12" width="10" height="10" rx="1.3" fill="#95d5b2" transform="rotate(-15 1 12)"/><rect x="6" y="6" width="10" height="10" rx="1.3" fill="#74c69d" transform="rotate(-15 6 6)"/><rect x="12" y="2" width="10" height="10" rx="1.3" fill="#d8f3dc" transform="rotate(-15 12 2)"/></svg>
+    <div><div class="logo-text">Grão<span>Certo</span></div><div class="logo-sub">Classificador Digital</div></div>
+  </div>
+  <div class="hdr-right">
+    <div class="ia-badge"><span class="pulse"></span>IA Ativa</div>
+    <button class="dark-btn" onclick="toggleDark()" id="darkBtn">🌙</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="setTab('consulta')">💬 Consulta</div>
+  <div class="tab" onclick="setTab('imagem')">📷 Imagem</div>
+  <div class="tab" onclick="setTab('amostra')">🧪 Amostra</div>
+  <div class="tab" onclick="setTab('calc')">🧮 Desconto</div>
+  <div class="tab" onclick="setTab('tabelas')">📋 Referência</div>
+  <div class="tab" onclick="setTab('glossario')">📖 Glossário</div>
+  <div class="tab" onclick="setTab('faq')">❓ FAQ</div>
+  <div class="tab" onclick="setTab('historico')">🕐 Histórico</div>
+  <div class="tab" onclick="setTab('planos')">⭐ Planos</div>
+  <div class="tab" onclick="setTab('sobre')">ℹ️ Sobre</div>
+</div>
+
+<!-- CONSULTA -->
+<div class="view active" id="tab-consulta">
+  <div class="counter-bar"><span>Consultas gratuitas: <strong id="counter">10</strong>/10</span><span class="uplink" onclick="setTab('planos')">Assinar Pro →</span></div>
+  <div class="modo-toggle">
+    <button class="mt-btn active" id="modoEst" onclick="setModo('estudante')">🎓 Estudante</button>
+    <button class="mt-btn" id="modoPro" onclick="setModo('profissional')">⚙️ Profissional</button>
+  </div>
+  <div class="slabel">Selecione o grão</div>
+  <div class="cgrid">
+    <div class="cc sel" onclick="selC(this,'Soja','IN 11/2007')"><div class="cc-dot"></div><div class="cc-em">🌱</div><div class="cc-nm">Soja</div><div class="cc-nr">IN 11/2007</div></div>
+    <div class="cc" onclick="selC(this,'Milho','IN 60/2011')"><div class="cc-dot"></div><div class="cc-em">🌽</div><div class="cc-nm">Milho</div><div class="cc-nr">IN 60/2011</div></div>
+    <div class="cc" onclick="selC(this,'Feijão','IN 12/2020')"><div class="cc-dot"></div><div class="cc-em">🫘</div><div class="cc-nm">Feijão</div><div class="cc-nr">IN 12/2020</div></div>
+    <div class="cc" onclick="selC(this,'Arroz','IN 6/2009')"><div class="cc-dot"></div><div class="cc-em">🌾</div><div class="cc-nm">Arroz</div><div class="cc-nr">IN 6/2009</div></div>
+    <div class="cc" onclick="selC(this,'Trigo','IN 38/2010')"><div class="cc-dot"></div><div class="cc-em">🌿</div><div class="cc-nm">Trigo</div><div class="cc-nr">IN 38/2010</div></div>
+  </div>
+  <div class="slabel">Perguntas rápidas</div>
+  <div class="qbtns" id="qbtns"></div>
+  <div class="chat-area" id="chatArea">
+    <div class="msg bot">👋 Olá! Sou o <strong>GrãoCerto v3.0</strong>, assistente técnico da <strong>LORD Serviços e Treinamentos</strong>.<br><br>5 culturas, Glossário, FAQ e Calculadora de Desconto. Selecione o grão e pergunte!</div>
+  </div>
+  <div class="irow">
+    <textarea class="ci" id="chatInput" placeholder="Sua dúvida técnica..." rows="1" onkeydown="hk(event,'sendMsg')" oninput="ar(this)"></textarea>
+    <button class="bs" id="sendBtn" onclick="sendMsg()">Enviar</button>
+  </div>
+  <div class="fl">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="2" y="16" width="12" height="12" rx="1.5" fill="#95d5b2" transform="rotate(-15 2 16)"/><rect x="9" y="9" width="12" height="12" rx="1.5" fill="#74c69d" transform="rotate(-15 9 9)"/><rect x="15" y="3" width="12" height="12" rx="1.5" fill="#2d6a4f" transform="rotate(-15 15 3)"/></svg>
+    <div><div class="fl-dev">Desenvolvido por</div><div class="fl-emp">LORD Serviços e Treinamentos</div><div class="fl-aut">Nilson Andrade — Classificador Oficial MAPA</div></div>
+  </div>
+</div>
+
+<!-- IMAGEM -->
+<div class="view" id="tab-imagem">
+  <div class="counter-bar"><span>Análises de imagem: <strong id="imgCounter">5</strong>/5</span><span class="uplink" onclick="setTab('planos')">Assinar Pro →</span></div>
+  <div class="stitle">Análise Visual de Defeitos</div>
+  <div class="ssub">Envie foto do grão sobre fundo claro. A IA identifica defeitos com base no Referencial Fotográfico do MAPA.</div>
+  <div class="cgrid">
+    <div class="cc sel" onclick="selIC(this,'Soja')"><div class="cc-dot"></div><div class="cc-em">🌱</div><div class="cc-nm">Soja</div></div>
+    <div class="cc" onclick="selIC(this,'Milho')"><div class="cc-dot"></div><div class="cc-em">🌽</div><div class="cc-nm">Milho</div></div>
+    <div class="cc" onclick="selIC(this,'Feijão')"><div class="cc-dot"></div><div class="cc-em">🫘</div><div class="cc-nm">Feijão</div></div>
+    <div class="cc" onclick="selIC(this,'Arroz')"><div class="cc-dot"></div><div class="cc-em">🌾</div><div class="cc-nm">Arroz</div></div>
+    <div class="cc" onclick="selIC(this,'Trigo')"><div class="cc-dot"></div><div class="cc-em">🌿</div><div class="cc-nm">Trigo</div></div>
+  </div>
+  <label class="upzone" for="imgUp"><input type="file" id="imgUp" accept="image/*" onchange="prevImg(event)"><div style="font-size:1.6rem;margin-bottom:4px">📸</div><div style="font-size:12px;color:var(--c3)">Toque para enviar imagem<br><small>Fundo claro • boa iluminação</small></div></label>
+  <img id="imgPrev" class="prev-img" style="display:none">
+  <div class="chat-area" id="imgChatArea"><div class="msg bot">📷 Envie uma foto e a IA analisará os <strong>defeitos visíveis</strong> com base no referencial do MAPA.</div></div>
+  <div class="irow" style="margin-top:6px">
+    <textarea class="ci" id="imgInput" placeholder="O que deseja saber?" rows="1" onkeydown="hk(event,'sendImgMsg')" oninput="ar(this)"></textarea>
+    <button class="bs" id="imgSendBtn" onclick="sendImgMsg()">Analisar</button>
+  </div>
+</div>
+
+<!-- AMOSTRA -->
+<div class="view" id="tab-amostra">
+  <div class="stitle">Análise de Amostra</div>
+  <div class="ssub">Informe os percentuais dos defeitos e receba a classificação conforme normas do MAPA.</div>
+  <div class="fcard">
+    <div class="slabel">Cultura</div>
+    <div class="fg"><select id="produtoAmostra" onchange="updF()">
+      <option value="soja">🌱 Soja — IN 11/2007</option><option value="milho">🌽 Milho — IN 60/2011</option><option value="feijao">🫘 Feijão — IN 12/2020</option><option value="arroz">🌾 Arroz — IN 6/2009</option><option value="trigo">🌿 Trigo — IN 38/2010</option>
+    </select></div>
+    <div id="fields-soja" class="fgrid">
+      <div class="fg"><label>Ardidos (%)</label><input type="number" id="s_ardidos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Queimados (%)</label><input type="number" id="s_queimados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Mofados (%)</label><input type="number" id="s_mofados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Fermentados (%)</label><input type="number" id="s_fermentados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Germinados (%)</label><input type="number" id="s_germinados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Danificados (%)</label><input type="number" id="s_danificados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Imaturos/Chochos (%)</label><input type="number" id="s_imaturos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Esverdeados (%)</label><input type="number" id="s_esverdeados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Amassados (%)</label><input type="number" id="s_amassados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Quebrados/Partidos (%)</label><input type="number" id="s_quebrados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg ff"><label>Impurezas (%)</label><input type="number" id="s_impurezas" placeholder="0.0" step="0.1" min="0"></div>
+    </div>
+    <div id="fields-milho" class="fgrid" style="display:none">
+      <div class="fg"><label>Ardidos (%)</label><input type="number" id="m_ardidos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Mofados (%)</label><input type="number" id="m_mofados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Fermentados (%)</label><input type="number" id="m_fermentados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Germinados (%)</label><input type="number" id="m_germinados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Gessados (%)</label><input type="number" id="m_gessados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Chochos/Imaturos (%)</label><input type="number" id="m_chochos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Carunchados (%)</label><input type="number" id="m_carunchados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Quebrados (%)</label><input type="number" id="m_quebrados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg ff"><label>Impurezas (%)</label><input type="number" id="m_impurezas" placeholder="0.0" step="0.1" min="0"></div>
+    </div>
+    <div id="fields-feijao" class="fgrid" style="display:none">
+      <div class="fg"><label>Mofados (%)</label><input type="number" id="f_mofados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Ardidos (%)</label><input type="number" id="f_ardidos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Germinados (%)</label><input type="number" id="f_germinados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Carunchados (%)</label><input type="number" id="f_carunchados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Danificados (%)</label><input type="number" id="f_danificados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Imaturos (%)</label><input type="number" id="f_imaturos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Partidos/Quebrados (%)</label><input type="number" id="f_quebrados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Insetos vivos</label><select id="f_insetos"><option value="nao">Não</option><option value="sim">Sim ⚠️</option></select></div>
+      <div class="fg ff"><label>Impurezas (%)</label><input type="number" id="f_impurezas" placeholder="0.0" step="0.1" min="0"></div>
+    </div>
+    <div id="fields-arroz" class="fgrid" style="display:none">
+      <div class="fg ff"><label>Subtipo</label><select id="a_subtipo"><option value="beneficiado">Beneficiado Polido</option><option value="parboilizado">Parboilizado Polido</option><option value="casca">Em Casca</option></select></div>
+      <div class="fg"><label>Quebrados (%)</label><input type="number" id="a_quebrados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Gessados (%)</label><input type="number" id="a_gessados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Ardidos (%)</label><input type="number" id="a_ardidos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Manchados (%)</label><input type="number" id="a_manchados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Mofados (%)</label><input type="number" id="a_mofados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Amarelos (%)</label><input type="number" id="a_amarelos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg ff"><label>Impurezas (%)</label><input type="number" id="a_impurezas" placeholder="0.0" step="0.1" min="0"></div>
+    </div>
+    <div id="fields-trigo" class="fgrid" style="display:none">
+      <div class="fg"><label>Ardidos (%)</label><input type="number" id="t_ardidos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Mofados (%)</label><input type="number" id="t_mofados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Germinados (%)</label><input type="number" id="t_germinados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Chochos/Imaturos (%)</label><input type="number" id="t_chochos" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Quebrados (%)</label><input type="number" id="t_quebrados" placeholder="0.0" step="0.1" min="0"></div>
+      <div class="fg"><label>Peso hectolitro (kg/hL)</label><input type="number" id="t_ph" placeholder="ex: 78" step="0.1" min="0"></div>
+      <div class="fg ff"><label>Impurezas (%)</label><input type="number" id="t_impurezas" placeholder="0.0" step="0.1" min="0"></div>
+    </div>
+    <button onclick="analisar()" class="btp" style="margin-top:11px">Classificar Amostra →</button>
+  </div>
+  <div id="resultadoAmostra" class="rcard" style="display:none"></div>
+</div>
+
+<!-- CALCULADORA -->
+<div class="view" id="tab-calc">
+  <div class="stitle">🧮 Calculadora de Desconto</div>
+  <div class="ssub">Calcule descontos por excesso de umidade, impurezas e defeitos no lote.</div>
+  <div class="calc-card">
+    <div class="calc-grid">
+      <div class="calc-field ff"><label>Cultura</label><select id="calc_cultura"><option value="soja">🌱 Soja</option><option value="milho">🌽 Milho</option><option value="feijao">🫘 Feijão</option><option value="arroz">🌾 Arroz</option><option value="trigo">🌿 Trigo</option></select></div>
+      <div class="calc-field"><label>Peso bruto (kg)</label><input type="number" id="calc_peso" placeholder="ex: 30000" min="0"></div>
+      <div class="calc-field"><label>Preço / saca 60kg (R$)</label><input type="number" id="calc_preco" placeholder="ex: 120.00" step="0.01" min="0"></div>
+      <div class="calc-field"><label>Umidade encontrada (%)</label><input type="number" id="calc_umidade" placeholder="ex: 16.5" step="0.1" min="0"></div>
+      <div class="calc-field"><label>Umidade base (%)</label><input type="number" id="calc_umbase" value="14" step="0.1" min="0"></div>
+      <div class="calc-field"><label>Impurezas (%)</label><input type="number" id="calc_imp" placeholder="ex: 1.5" step="0.1" min="0"></div>
+      <div class="calc-field"><label>Tolerância impurezas (%)</label><input type="number" id="calc_impbase" value="1" step="0.1" min="0"></div>
+      <div class="calc-field"><label>Defeitos graves (%)</label><input type="number" id="calc_defeitos" placeholder="ex: 2.0" step="0.1" min="0"></div>
+      <div class="calc-field"><label>Tolerância defeitos (%)</label><input type="number" id="calc_defbase" value="2" step="0.1" min="0"></div>
+    </div>
+    <button class="calc-btn" onclick="calcDesconto()">Calcular Desconto →</button>
+    <div class="calc-result" id="calc_result"></div>
+  </div>
+  <div class="aviso">⚠️ Cálculo baseado em práticas comerciais comuns. Sempre confira o contrato de compra e venda.</div>
+</div>
+
+<!-- TABELAS -->
+<div class="view" id="tab-tabelas">
+  <div class="stitle">📋 Tabelas de Referência</div>
+  <div class="ssub">Limites oficiais do MAPA para consulta rápida.</div>
+  <div class="ref-tabs">
+    <button class="ref-tab active" onclick="setRefTab('soja')">🌱 Soja</button>
+    <button class="ref-tab" onclick="setRefTab('milho')">🌽 Milho</button>
+    <button class="ref-tab" onclick="setRefTab('feijao')">🫘 Feijão</button>
+    <button class="ref-tab" onclick="setRefTab('arroz')">🌾 Arroz</button>
+    <button class="ref-tab" onclick="setRefTab('trigo')">🌿 Trigo</button>
+    <button class="ref-tab" onclick="setRefTab('defeitos')">⚠️ Defeitos</button>
+  </div>
+  <div class="ref-content active" id="ref-soja">
+    <div class="slabel" style="margin-bottom:5px">Grupo I — IN 11/2007</div>
+    <table class="ref-table"><thead><tr><th>Parâmetro</th><th>Tipo 1</th><th>Tipo 2</th></tr></thead><tbody>
+      <tr><td>Ardidos + Queimados</td><td>≤ 1,0%</td><td>≤ 2,0%</td></tr>
+      <tr><td>Máx. Queimados</td><td>≤ 0,3%</td><td>≤ 1,0%</td></tr>
+      <tr><td>Mofados</td><td>≤ 0,5%</td><td>≤ 1,5%</td></tr>
+      <tr><td>Total Avariados</td><td>≤ 8,0%</td><td>≤ 15,0%</td></tr>
+      <tr><td>Esverdeados</td><td>≤ 2,0%</td><td>≤ 4,0%</td></tr>
+      <tr><td>Quebrados + Amassados</td><td>≤ 15,0%</td><td>≤ 30,0%</td></tr>
+      <tr><td>Impurezas</td><td>≤ 1,0%</td><td>≤ 1,0%</td></tr>
+    </tbody></table>
+    <div style="margin-top:.7rem" class="slabel">Grupo II — Padrão Básico</div>
+    <table class="ref-table"><thead><tr><th>Parâmetro</th><th>Padrão Básico</th></tr></thead><tbody>
+      <tr><td>Ardidos + Queimados</td><td>≤ 4,0%</td></tr>
+      <tr><td>Mofados</td><td>≤ 6,0%</td></tr>
+      <tr><td>Total Avariados</td><td>≤ 30,0%</td></tr>
+      <tr><td>Esverdeados</td><td>≤ 8,0%</td></tr>
+      <tr><td>Quebrados</td><td>≤ 8,0%</td></tr>
+      <tr><td>Impurezas</td><td>≤ 1,0%</td></tr>
+    </tbody></table>
+    <div class="ref-note">⛔ Desclassificado: graves >40% (outros usos), >12% (alim. humana), insetos vivos, odor estranho.</div>
+  </div>
+  <div class="ref-content" id="ref-milho">
+    <table class="ref-table"><thead><tr><th>Parâmetro</th><th>Tipo 1</th><th>Tipo 2</th><th>Tipo 3</th></tr></thead><tbody>
+      <tr><td>Ardidos</td><td>≤ 1%</td><td>≤ 2%</td><td>≤ 3%</td></tr>
+      <tr><td>Total Avariados</td><td>≤ 6%</td><td>≤ 10%</td><td>≤ 15%</td></tr>
+      <tr><td>Carunchados</td><td>≤ 2%</td><td>≤ 3%</td><td>≤ 4%</td></tr>
+      <tr><td>Quebrados</td><td>≤ 3%</td><td>≤ 4%</td><td>≤ 5%</td></tr>
+      <tr><td>Impurezas</td><td>≤ 1%</td><td>≤ 1,5%</td><td>≤ 2%</td></tr>
+    </tbody></table>
+    <div class="ref-note">Fora de Tipo: ardidos >5%, total >20%. Gravidade: mofado>ardido>fermentado>germinado>carunchado>chocho/imaturo>gessado.</div>
+  </div>
+  <div class="ref-content" id="ref-feijao">
+    <table class="ref-table"><thead><tr><th>Tipo</th><th>Total Defeitos</th><th>Situação</th></tr></thead><tbody>
+      <tr><td><span class="badge-tipo b1">Tipo 1</span></td><td>≤ 4%</td><td>Melhor qualidade</td></tr>
+      <tr><td><span class="badge-tipo b2">Tipo 2</span></td><td>≤ 8%</td><td>Padrão comercial</td></tr>
+      <tr><td><span class="badge-tipo b3">Tipo 3</span></td><td>≤ 12%</td><td>Qualidade mínima</td></tr>
+      <tr><td><span class="badge-tipo bf">Fora de Tipo</span></td><td>> 12%</td><td>Com identificação</td></tr>
+    </tbody></table>
+    <div class="ref-note">⛔ Insetos vivos: tolerância ZERO. Classe: ≥97% mesma cor = pura; 90–96,9% = predominante; &lt;90% = Misturado.</div>
+  </div>
+  <div class="ref-content" id="ref-arroz">
+    <div class="slabel" style="margin-bottom:5px">Beneficiado Polido</div>
+    <table class="ref-table"><thead><tr><th>Parâmetro</th><th>Tipo 1</th><th>Tipo 2</th><th>Tipo 3</th></tr></thead><tbody>
+      <tr><td>Quebrados</td><td>≤ 5%</td><td>≤ 15%</td><td>≤ 25%</td></tr>
+      <tr><td>Gessados</td><td>≤ 10%</td><td>≤ 20%</td><td>≤ 30%</td></tr>
+      <tr><td>Total defeitos</td><td>≤ 7%</td><td>≤ 14%</td><td>≤ 20%</td></tr>
+    </tbody></table>
+    <div style="margin-top:.7rem" class="slabel">Parboilizado Polido</div>
+    <table class="ref-table"><thead><tr><th>Parâmetro</th><th>Tipo 1</th><th>Tipo 2</th><th>Tipo 3</th></tr></thead><tbody>
+      <tr><td>Quebrados</td><td>≤ 5%</td><td>≤ 15%</td><td>≤ 25%</td></tr>
+      <tr><td>Total defeitos</td><td>≤ 6%</td><td>≤ 12%</td><td>≤ 20%</td></tr>
+    </tbody></table>
+    <div class="ref-note">Peck NÃO é defeito. Umidade recomendada: máx 14%.</div>
+  </div>
+  <div class="ref-content" id="ref-trigo">
+    <table class="ref-table"><thead><tr><th>Parâmetro</th><th>Tipo 1</th><th>Tipo 2</th><th>Tipo 3</th></tr></thead><tbody>
+      <tr><td>Peso hectolitro (kg/hL)</td><td>≥ 78</td><td>≥ 75</td><td>≥ 70</td></tr>
+      <tr><td>Ardidos + Mofados</td><td>≤ 0,5%</td><td>≤ 1,0%</td><td>≤ 2,0%</td></tr>
+      <tr><td>Germinados</td><td>≤ 0,5%</td><td>≤ 1,5%</td><td>≤ 3,0%</td></tr>
+      <tr><td>Chochos + Imaturos</td><td>≤ 1,0%</td><td>≤ 2,0%</td><td>≤ 4,0%</td></tr>
+      <tr><td>Quebrados</td><td>≤ 1,0%</td><td>≤ 2,0%</td><td>≤ 3,0%</td></tr>
+      <tr><td>Impurezas</td><td>≤ 1,0%</td><td>≤ 1,5%</td><td>≤ 2,0%</td></tr>
+      <tr><td>Umidade máx.</td><td>13%</td><td>13%</td><td>13%</td></tr>
+    </tbody></table>
+    <div class="ref-note">Peso hectolitro é o principal indicador de qualidade. Quanto maior, melhor o rendimento em farinha.</div>
+  </div>
+  <div class="ref-content" id="ref-defeitos">
+    <div class="slabel" style="margin-bottom:7px">Principais Defeitos — Soja IN 11/2007</div>
+    <div class="defects-grid">
+      <div class="defect-card"><div class="defect-nome">Queimado</div><span class="defect-tipo dt-grave">Grave</span><div class="defect-desc">Grão carbonizado. Maior gravidade.</div></div>
+      <div class="defect-card"><div class="defect-nome">Ardido</div><span class="defect-tipo dt-grave">Grave</span><div class="defect-desc">Coloração marrom/escura na polpa por fermentação.</div></div>
+      <div class="defect-card"><div class="defect-nome">Mofado</div><span class="defect-tipo dt-grave">Grave</span><div class="defect-desc">Fungo visível a olho nu.</div></div>
+      <div class="defect-card"><div class="defect-nome">Fermentado</div><span class="defect-tipo dt-leve">Leve</span><div class="defect-desc">Alteração de cor no cotilédone.</div></div>
+      <div class="defect-card"><div class="defect-nome">Esverdeado</div><span class="defect-tipo dt-leve">Leve</span><div class="defect-desc">Coloração verde no cotilédone.</div></div>
+      <div class="defect-card"><div class="defect-nome">Germinado</div><span class="defect-tipo dt-leve">Leve</span><div class="defect-desc">Emissão visível de radícula.</div></div>
+      <div class="defect-card"><div class="defect-nome">Danificado</div><span class="defect-tipo dt-leve">Leve</span><div class="defect-desc">Manchas, perfurações, ataques.</div></div>
+      <div class="defect-card"><div class="defect-nome">Imaturo/Chocho</div><span class="defect-tipo dt-leve">Leve</span><div class="defect-desc">Atrofiado, enrugado, incompleto.</div></div>
+    </div>
+    <div class="ref-note" style="margin-top:.7rem">Mancha púrpura e mancha café NÃO são defeitos na soja.</div>
+  </div>
+</div>
+
+<!-- GLOSSÁRIO -->
+<div class="view" id="tab-glossario">
+  <div class="stitle">📖 Glossário Técnico</div>
+  <div class="ssub">Termos oficiais da classificação vegetal. Toque para ver a definição.</div>
+  <input class="gloss-search" id="glossSearch" placeholder="Buscar termo técnico..." oninput="filtrarGloss(this.value)">
+  <div id="glossLista"></div>
+</div>
+
+<!-- FAQ -->
+<div class="view" id="tab-faq">
+  <div class="stitle">❓ Perguntas Frequentes</div>
+  <div class="ssub">Dúvidas comuns respondidas com base nas normas do MAPA.</div>
+  <div class="faq-cat">
+    <button class="faq-cat-btn active" onclick="filtrarFaq(this,'todos')">Todos</button>
+    <button class="faq-cat-btn" onclick="filtrarFaq(this,'soja')">🌱 Soja</button>
+    <button class="faq-cat-btn" onclick="filtrarFaq(this,'milho')">🌽 Milho</button>
+    <button class="faq-cat-btn" onclick="filtrarFaq(this,'feijao')">🫘 Feijão</button>
+    <button class="faq-cat-btn" onclick="filtrarFaq(this,'arroz')">🌾 Arroz</button>
+    <button class="faq-cat-btn" onclick="filtrarFaq(this,'geral')">⚙️ Geral</button>
+  </div>
+  <div id="faqLista"></div>
+</div>
+
+<!-- HISTÓRICO -->
+<div class="view" id="tab-historico">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+    <div class="stitle" style="margin-bottom:0">🕐 Histórico da Sessão</div>
+    <button class="hist-clear" onclick="limparHistorico()">Limpar</button>
+  </div>
+  <div id="historicoLista"><div class="hist-empty">Nenhuma análise realizada ainda.</div></div>
+</div>
+
+<!-- PLANOS -->
+<div class="view" id="tab-planos">
+  <div class="stitle">Planos GrãoCerto</div>
+  <div class="ssub">Escolha o plano ideal para o seu perfil.</div>
+  <div class="pgrid">
+    <div class="pc"><div class="pc-nm">Gratuito</div><div class="pc-pr">R$0<small>/mês</small></div><ul class="pc-ft" style="margin-top:5px"><li>10 consultas/mês</li><li>5 análises imagem</li><li>5 culturas</li><li>Calculadora</li><li>Glossário + FAQ</li></ul></div>
+    <div class="pc dest"><div class="pbdg">POPULAR</div><div class="pc-nm">Pro</div><div class="pc-pr">R$29<small>/mês</small></div><ul class="pc-ft" style="margin-top:5px"><li>Consultas ilimitadas</li><li>Imagens ilimitadas</li><li>Histórico salvo</li><li>Todas as culturas</li><li>Suporte prioritário</li></ul></div>
+  </div>
+  <div class="emp-card">
+    <div style="font-family:'Fraunces',serif;font-weight:700;font-size:.88rem;color:var(--v2);margin-bottom:3px">🏢 Plano Empresa</div>
+    <div style="font-size:11.5px;color:var(--c2);line-height:1.65">Até 20 classificadores em um plano. Ideal para armazéns e cooperativas.</div>
+    <button onclick="cw()" class="btp" style="width:auto;padding:7px 15px;margin-top:7px">💬 Falar no WhatsApp</button>
+  </div>
+  <div class="divider"></div>
+  <div class="fl">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="2" y="15" width="11" height="11" rx="1.3" fill="#95d5b2" transform="rotate(-15 2 15)"/><rect x="8" y="8" width="11" height="11" rx="1.3" fill="#74c69d" transform="rotate(-15 8 8)"/><rect x="14" y="3" width="11" height="11" rx="1.3" fill="#2d6a4f" transform="rotate(-15 14 3)"/></svg>
+    <div><div class="fl-dev">Uma solução</div><div class="fl-emp">LORD Serviços e Treinamentos</div><div class="fl-aut">Classificação Vegetal • MAPA</div></div>
+  </div>
+  <div style="font-size:10px;color:var(--c3);text-align:center;margin-top:.6rem">🔒 Pagamento seguro • Cancele a qualquer momento</div>
+</div>
+
+<!-- SOBRE -->
+<div class="view" id="tab-sobre">
+  <div class="stitle">Sobre o GrãoCerto</div>
+  <div class="scard">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--b2)">
+      <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><rect x="3" y="21" width="16" height="16" rx="2" fill="#95d5b2" transform="rotate(-15 3 21)"/><rect x="11" y="12" width="16" height="16" rx="2" fill="#74c69d" transform="rotate(-15 11 12)"/><rect x="20" y="5" width="16" height="16" rx="2" fill="#2d6a4f" transform="rotate(-15 20 5)"/></svg>
+      <div>
+        <div style="font-family:'Fraunces',serif;font-weight:900;font-size:.95rem;color:var(--c1)">Nilson Andrade</div>
+        <div style="font-size:10.5px;color:var(--c3)">Classificador Oficial • Coord. de Operações</div>
+        <span style="display:inline-block;background:var(--vp);color:var(--v2);font-size:9px;padding:2px 7px;border-radius:4px;margin-top:3px;font-weight:600">Credenciado MAPA</span>
+      </div>
+    </div>
+    <div style="font-size:11.5px;color:var(--c2);line-height:1.7">Desenvolvido por <strong>Nilson Andrade</strong> com base nas apostilas da <strong>LORD Serviços e Treinamentos</strong>. Conteúdo baseado nas normas oficiais do Ministério da Agricultura, Pecuária e Abastecimento.</div>
+  </div>
+  <div class="scard">
+    <div style="font-family:'Fraunces',serif;font-weight:700;font-size:.85rem;margin-bottom:6px;color:var(--c1)">📋 Base Normativa</div>
+    <div style="font-size:11px;color:var(--c2);line-height:2">
+      • IN MAPA nº 11/2007 — Classificação da Soja<br>
+      • IN MAPA nº 60/2011 — Classificação do Milho<br>
+      • IN MAPA nº 12/2020 — Classificação do Feijão<br>
+      • IN MAPA nº 6/2009 — Classificação do Arroz<br>
+      • IN MAPA nº 38/2010 — Classificação do Trigo<br>
+      • Referencial Fotográfico de Grãos MAPA 2022
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--c3);text-align:center;margin-top:.8rem;line-height:1.8">
+    GrãoCerto v3.0 • LORD Serviços e Treinamentos<br>
+    Nilson Andrade • Classificador Credenciado MAPA<br>
+    ℹ️ As análises são orientativas e não substituem laudos oficiais.
+  </div>
+</div>
+
+<div class="mo" id="upModal">
+  <div class="mo-box">
+    <span class="mo-x" onclick="cm()">✕</span>
+    <div style="font-size:1.4rem;margin-bottom:6px">🌾</div>
+    <div class="mo-title">Limite atingido</div>
+    <div style="font-size:12px;color:var(--c3);margin:4px 0 9px;line-height:1.6">Assine o <strong>GrãoCerto Pro</strong> por R$29/mês para acesso ilimitado.</div>
+    <button class="btp">Assinar Pro — R$29/mês</button>
+    <button class="bto" onclick="cm()">Continuar Gratuito</button>
+  </div>
+</div>
+
+<script>
+let sc='Soja',sn='IN 11/2007',sic='Soja',fc=10,ifc=5,ld=false,ib64=null,modo='estudante',dk=false,hist=[];
+
+const QPS={Soja:['O que é grão ardido?','Limite de mofados Tipo 1','O que é grão esverdeado?','Quando a soja é desclassificada?','Diferença Grupo I e Grupo II','Escala de gravidade da soja'],Milho:['O que é grão gessado?','Limite de ardidos por tipo','O que é grão carunchado?','Fora de Tipo no milho','Diferença ardido vs fermentado','Escala de gravidade do milho'],Feijão:['Tipos do feijão carioca','Inseto vivo: o que ocorre?','Diferença Tipo 1, 2 e 3','O que é feijão mungo?','Como determinar a classe','Limite de defeitos por tipo'],Arroz:['Diferença beneficiado e parboilizado','O que é grão gessado no arroz?','O que é Peck?','Tipos do arroz beneficiado','Defeitos do parboilizado','Limite de quebrados'],Trigo:['Como funciona o peso hectolitro?','Tipos do trigo IN 38/2010','O que são grãos ardidos no trigo?','Limite de germinados por tipo','Diferença trigo duro e mole','Quando o trigo é desclassificado?']};
+
+const GLOSS=[
+  {t:'Ardido',c:'defeito',cat:'gc-defeito',d:'Grão ou pedaço de grão que se apresenta visivelmente fermentado, com coloração <em>marrom ou escura</em> afetando a polpa. Inclui grãos queimados por secagem. É um <em>defeito grave</em> nas normas MAPA.'},
+  {t:'Amostra de trabalho',c:'processo',cat:'gc-processo',d:'Porção da amostra utilizada para a realização da classificação. Para soja: <em>mínimo 125g</em>. Para milho: <em>mínimo 250g</em>. Obtida por quarteamento da amostra de 1kg.'},
+  {t:'Avariados',c:'defeito',cat:'gc-defeito',d:'Conjunto de grãos que apresentam defeitos: queimados, ardidos, mofados, fermentados, germinados, danificados, imaturos e chochos. Dividem-se em <em>defeitos graves e leves</em>.'},
+  {t:'Carunchado',c:'defeito',cat:'gc-defeito',d:'Grão atacado por insetos considerados pragas de grãos armazenados, em qualquer fase evolutiva. No milho, é contabilizado separadamente dos avariados. Indica problema de <em>armazenamento inadequado</em>.'},
+  {t:'Classificação vegetal',c:'norma',cat:'gc-norma',d:'Ato de determinar a qualidade de um produto vegetal mediante análises específicas e comparação com os padrões oficiais aprovados pelo MAPA (Lei nº 9.972/2000 e Decreto nº 3.664/2000).'},
+  {t:'Chocho / Imaturo',c:'defeito',cat:'gc-defeito',d:'Grão desprovido de massa interna, enrugado, com desenvolvimento fisiológico incompleto. É um <em>defeito leve</em>. No milho, grãos pequenos da ponta de espiga <em>não</em> são considerados chochos.'},
+  {t:'Danificado',c:'defeito',cat:'gc-defeito',d:'Grão com manchas na polpa, deformado, perfurado ou atacado por doenças/insetos. É <em>defeito leve</em>. Na soja, grãos picados por insetos sugadores têm o percentual dividido por 4.'},
+  {t:'Defeito grave',c:'norma',cat:'gc-norma',d:'Defeito que compromete seriamente a aparência, conservação e qualidade do produto. Na soja: <em>queimados, ardidos e mofados</em>. Podem levar à desclassificação quando ultrapassam os limites máximos.'},
+  {t:'Defeito leve',c:'norma',cat:'gc-norma',d:'Defeito que não restringe a utilização do produto. Na soja: <em>fermentados, danificados, germinados, imaturos, chochos, esverdeados, amassados, partidos e quebrados</em>.'},
+  {t:'Desclassificado',c:'norma',cat:'gc-norma',d:'Produto impróprio para consumo, com <em>comercialização proibida</em>. Ocorre por mau estado de conservação, defeitos acima dos limites máximos, insetos vivos, odor estranho ou sementes tóxicas.'},
+  {t:'Esverdeado',c:'defeito',cat:'gc-defeito',d:'Grão com desenvolvimento fisiológico completo que apresenta <em>coloração totalmente esverdeada</em> no cotilédone. Defeito leve na soja. Indica colheita antecipada.'},
+  {t:'Fora de Tipo',c:'norma',cat:'gc-norma',d:'Produto que não atende às especificações do pior tipo permitido. Pode ser <em>comercializado com identificação</em> ou rebeneficiado para enquadramento, dependendo do tipo de defeito.'},
+  {t:'Germinado',c:'defeito',cat:'gc-defeito',d:'Grão que apresenta visivelmente a <em>emissão de radícula</em> (broto). Defeito leve. Indica absorção excessiva de umidade.'},
+  {t:'Gessado',c:'defeito',cat:'gc-defeito',d:'Grão com aparência opaca e cor <em>branco-leitosa</em> semelhante ao gesso. No arroz, indica gelatinização incompleta do amido. No milho, endosperma amiláceo com aspecto córneo opaco.'},
+  {t:'Grupo',c:'norma',cat:'gc-norma',d:'Divisão do produto conforme o <em>uso proposto</em> (soja) ou <em>espécie botânica</em> (feijão). Na soja: Grupo I = consumo in natura; Grupo II = outros usos.'},
+  {t:'Homogeneização',c:'processo',cat:'gc-processo',d:'Mistura uniforme das amostras coletadas, para garantir que a amostra de trabalho seja <em>representativa do todo do lote</em>. Etapa obrigatória antes do quarteamento.'},
+  {t:'Impurezas',c:'norma',cat:'gc-norma',d:'Detritos do próprio produto que passam pela peneira de referência. Diferente de <em>matérias estranhas</em> (materiais externos como sementes de outras espécies, pedras, insetos mortos).'},
+  {t:'Instrução Normativa',c:'norma',cat:'gc-norma',d:'Ato normativo do MAPA que estabelece padrões oficiais de classificação. Cada cultura tem sua IN: soja (11/2007), milho (60/2011), feijão (12/2020), arroz (6/2009), trigo (38/2010).'},
+  {t:'Laudo de classificação',c:'processo',cat:'gc-processo',d:'Documento técnico com os resultados da análise. Deve conter identificação do lote, defeitos, tipo final, assinatura e registro do <em>classificador credenciado pelo MAPA</em>.'},
+  {t:'Mofado',c:'defeito',cat:'gc-defeito',d:'Grão com fungos (mofo ou bolor) <em>visíveis a olho nu</em>. Defeito grave em todas as culturas. No milho, inclui grãos com coloração esverdeada/azulada no germe por fungos.'},
+  {t:'Padrão Básico',c:'norma',cat:'gc-norma',d:'Denominação usada para o único tipo do Grupo II da soja (outros usos). Permite limites mais amplos que o Tipo 2 do Grupo I.'},
+  {t:'Peck',c:'defeito',cat:'gc-defeito',d:'Minúsculas perfurações (alfinetadas) no arroz. Segundo a IN 6/2009, <em>NÃO são consideradas defeitos</em>, mesmo quando ocorrem várias no mesmo grão.'},
+  {t:'Peso hectolitro',c:'qualidade',cat:'gc-qualidade',d:'Densidade aparente do grão em kg/100L. Principal indicador de qualidade do trigo. <em>Quanto maior, melhor</em> o rendimento industrial em farinha. Tipo 1 ≥ 78 kg/hL.'},
+  {t:'Quarteamento',c:'processo',cat:'gc-processo',d:'Método de redução de amostras: divide o material em quatro partes, descarta duas opostas e reúne as outras duas. Garante <em>representatividade sem alterar as características</em> da amostra.'},
+  {t:'Quebrado',c:'defeito',cat:'gc-defeito',d:'Pedaço de grão que perdeu parte do seu tamanho. Na soja: retido na peneira 3mm. No arroz: comprimento inferior a ¾ do grão inteiro. Defeito <em>leve</em>.'},
+  {t:'Tipo',c:'norma',cat:'gc-norma',d:'Classificação baseada na qualidade, definida pelos limites de tolerância. <em>Menor número = maior qualidade</em> (Tipo 1 > Tipo 2 > Tipo 3).'},
+  {t:'Umidade',c:'qualidade',cat:'gc-qualidade',d:'Percentual de água no grão. Limite recomendado para a maioria das culturas: <em>máximo 14%</em>. Deve ser obrigatoriamente determinada e informada no laudo, mas não define o tipo.'},
+];
+
+const FAQS=[
+  {q:'Qual a diferença entre defeito grave e defeito leve na soja?',r:'<strong>Defeitos graves</strong> são queimados, ardidos e mofados — comprometem seriamente a qualidade e podem levar à desclassificação. <strong>Defeitos leves</strong> são fermentados, danificados, germinados, imaturos, chochos, esverdeados, amassados, partidos e quebrados.',cat:'soja'},
+  {q:'Quando a soja é desclassificada?',r:'A soja é desclassificada quando: defeitos graves ultrapassam <strong>40%</strong> (outros usos) ou <strong>12%</strong> (alim. humana); presença de insetos vivos; odor estranho; ou mau estado de conservação.',cat:'soja'},
+  {q:'O que é o Grupo I e Grupo II da soja?',r:'<strong>Grupo I</strong> = consumo in natura, com Tipo 1 e Tipo 2. <strong>Grupo II</strong> = outros usos (esmagamento, ração) com limite único chamado Padrão Básico — menos restritivo.',cat:'soja'},
+  {q:'Como calcular o percentual de defeitos?',r:'Fórmula: <strong>% = (peso do defeito em g × 100) ÷ peso da amostra em g</strong>. Resultado com 1 casa decimal para soja e 2 casas para milho.',cat:'geral'},
+  {q:'O que fazer quando o milho apresenta grãos carunchados?',r:'Verificar o lote e, se necessário, realizar <strong>expurgo</strong> antes da comercialização. Milho com insetos vivos não pode ser comercializado sem tratamento prévio.',cat:'milho'},
+  {q:'Qual a tolerância para insetos vivos no feijão?',r:'Tolerância <strong>ZERO</strong>. A presença de qualquer inseto vivo implica em <strong>desclassificação imediata</strong> do produto.',cat:'feijao'},
+  {q:'O que é a classe no feijão e como é determinada?',r:'Representa a coloração predominante do tegumento. <strong>≥97%</strong> da mesma cor = classe pura. Entre 90–96,9% = "Classe predominante X". Abaixo de 90% = "Misturado".',cat:'feijao'},
+  {q:'O que é Peck no arroz e é defeito?',r:'Peck são minúsculas perfurações (alfinetadas) no grão de arroz. Segundo a IN 6/2009, <strong>não são consideradas defeitos</strong>.',cat:'arroz'},
+  {q:'Qual a diferença entre arroz beneficiado e parboilizado?',r:'<strong>Beneficiado</strong>: descascado e polido, branco, menor valor nutritivo. <strong>Parboilizado</strong>: passa por hidratação, vaporização e secagem antes do beneficiamento — amarelado, mais nutritivo, menor quebra.',cat:'arroz'},
+  {q:'O que é peso hectolitro no trigo?',r:'Densidade aparente em kg/100L — <strong>principal indicador de qualidade</strong>. Maior PH = mais rendimento em farinha. Tipo 1 ≥78, Tipo 2 ≥75, Tipo 3 ≥70 kg/hL.',cat:'trigo'},
+  {q:'Quem pode realizar a classificação oficial de grãos?',r:'Apenas profissionais <strong>credenciados pelo MAPA</strong> podem emitir laudos oficiais, conforme Lei nº 9.972/2000.',cat:'geral'},
+  {q:'O que é quarteamento e por que é importante?',r:'Método de reduzir a amostra dividindo em quatro partes, descartando duas opostas. Garante que a <strong>amostra seja representativa</strong> do lote.',cat:'geral'},
+  {q:'Quando um produto é enquadrado como Fora de Tipo?',r:'Quando os defeitos ultrapassam os limites do <strong>pior tipo aceito</strong> na norma. Pode ser comercializado com identificação "Fora de Tipo" ou rebeneficiado.',cat:'geral'},
+  {q:'Qual a umidade recomendada para comercialização?',r:'Para a maioria das culturas: <strong>máximo 14%</strong>. A umidade não determina o tipo, mas deve ser informada no laudo.',cat:'geral'},
+];
+
+const SYS=`Você é especialista em classificação de grãos, assistente do GrãoCerto v3.0 — LORD Serviços e Treinamentos, Nilson Andrade.
+SOJA IN11/2007: GI T1: ard+que<=1%,que<=0.3%,mof<=0.5%,av<=8%,esv<=2%,qbr+ama<=15%,imp<=1%. T2: ard+que<=2%,que<=1%,mof<=1.5%,av<=15%,esv<=4%,qbr<=30%,imp<=1%. GII PB: ard+que<=4%,mof<=6%,av<=30%,esv<=8%,qbr<=8%,imp<=1%. Desclass: graves>40%,>12%alim,insetos,odor.
+MILHO IN60/2011: T1: ard<=1%,tot<=6%,qbr<=3%,imp<=1%,car<=2%. T2: ard<=2%,tot<=10%,qbr<=4%,imp<=1.5%,car<=3%. T3: ard<=3%,tot<=15%,qbr<=5%,imp<=2%,car<=4%. ForaTipo: ard>5%,tot>20%.
+FEIJAO IN12/2020: T1<=4%,T2<=8%,T3<=12%,FT>12%. Insetos=ZERO.
+ARROZ IN6/2009: Benef T1 qbr<=5%,ges<=10%,def<=7%. T2 qbr<=15%,ges<=20%,def<=14%. T3 qbr<=25%,ges<=30%,def<=20%. Parboil T1 qbr<=5%,def<=6%. T2 qbr<=15%,def<=12%. Peck NAO e defeito.
+TRIGO IN38/2010: T1: PH>=78,ard+mof<=0.5%,ger<=0.5%,cho<=1%,qbr<=1%,imp<=1%,umid<=13%. T2: PH>=75,ard+mof<=1%,ger<=1.5%,cho<=2%,qbr<=2%,imp<=1.5%. T3: PH>=70,ard+mof<=2%,ger<=3%,cho<=4%,qbr<=3%,imp<=2%.
+MODO:{MODO}. Cite sempre a IN. Nunca invente limites. Estudante=didatico+exemplos. Profissional=direto+tecnico.`;
+
+function startApp(){document.getElementById('onboard').classList.add('hidden');}
+function setTab(t){const ts=['consulta','imagem','amostra','calc','tabelas','glossario','faq','historico','planos','sobre'];document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',ts[i]===t));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');}
+function selC(el,n,nr){document.querySelectorAll('#tab-consulta .cc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');sc=n;sn=nr;renderQBtns();}
+function selIC(el,n){document.querySelectorAll('#tab-imagem .cc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');sic=n;}
+function setModo(m){modo=m;document.getElementById('modoEst').classList.toggle('active',m==='estudante');document.getElementById('modoPro').classList.toggle('active',m==='profissional');}
+function toggleDark(){dk=!dk;document.body.setAttribute('data-dark',dk?'1':'0');document.getElementById('darkBtn').textContent=dk?'☀️':'🌙';}
+function renderQBtns(){const c=document.getElementById('qbtns');c.innerHTML='';(QPS[sc]||[]).forEach(q=>{const b=document.createElement('div');b.className='qb';b.textContent=q;b.onclick=()=>qp(q);c.appendChild(b);});}
+function qp(t){document.getElementById('chatInput').value=t;sendMsg();}
+function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,95)+'px';}
+function hk(e,fn){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window[fn]();}}
+function prevImg(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{ib64=ev.target.result.split(',')[1];const p=document.getElementById('imgPrev');p.src=ev.target.result;p.style.display='block';};r.readAsDataURL(f);}
+function addMsg(a,h,t){const d=document.createElement('div');d.className='msg '+t;d.innerHTML=h;a.appendChild(d);a.scrollTop=a.scrollHeight;}
+function showT(a){const t=document.createElement('div');t.className='typing';t.id='t_'+a.id;t.innerHTML='<span></span><span></span><span></span>';a.appendChild(t);a.scrollTop=a.scrollHeight;}
+function killT(a){const t=document.getElementById('t_'+a.id);if(t)t.remove();}
+function fmt(x){return x.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>').replace(/\b(Tipo [123]|Padrão Básico)\b/g,'<span class="tag tt">$1</span>').replace(/\b(Fora de Tipo|Fora do Padrão)\b/g,'<span class="tag tt">$1</span>').replace(/\b(Desclassificado)\b/g,'<span class="tag td">$1</span>').replace(/defeitos? graves?/gi,'<span class="tag tg">$&</span>').replace(/defeitos? leves?/gi,'<span class="tag tl">$&</span>');}
+async function ai(msgs){const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS.replace('{MODO}',modo),messages:msgs})});const d=await r.json();return d.content?.map(i=>i.text||'').join('')||'Erro.';}
+
+async function sendMsg(){
+  const inp=document.getElementById('chatInput');const text=inp.value.trim();if(!text||ld)return;
+  if(fc<=0){document.getElementById('upModal').classList.add('open');return;}
+  ld=true;fc--;document.getElementById('counter').textContent=fc;document.getElementById('sendBtn').disabled=true;
+  const a=document.getElementById('chatArea');addMsg(a,text,'user');inp.value='';inp.style.height='auto';showT(a);
+  try{const ans=await ai([{role:'user',content:`Grão: ${sc} (${sn})\nModo: ${modo}\n\n${text}`}]);killT(a);addMsg(a,fmt(ans),'bot');salvarHist('consulta',sc,text,ans);}
+  catch{killT(a);addMsg(a,'Erro ao conectar. Tente novamente.','bot');}
+  ld=false;document.getElementById('sendBtn').disabled=false;
+}
+
+async function sendImgMsg(){
+  const inp=document.getElementById('imgInput');const text=inp.value.trim()||'Analise esta imagem e identifique os defeitos visíveis.';
+  const a=document.getElementById('imgChatArea');const btn=document.getElementById('imgSendBtn');
+  if(ifc<=0){document.getElementById('upModal').classList.add('open');return;}
+  if(ld)return;ld=true;ifc--;document.getElementById('imgCounter').textContent=ifc;btn.disabled=true;
+  addMsg(a,text,'user');inp.value='';showT(a);
+  try{
+    let msgs=ib64?[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:ib64}},{type:'text',text:`Grão: ${sic}\n${text}\nDefeito provável, características, grave/leve, confiança, recomendação.`}]}]:[{role:'user',content:`Grão: ${sic}\nNenhuma imagem enviada.`}];
+    const ans=await ai(msgs);killT(a);addMsg(a,fmt(ans),'bot');salvarHist('imagem',sic,`[Foto] ${text}`,ans);ib64=null;document.getElementById('imgPrev').style.display='none';
+  }catch{killT(a);addMsg(a,'Erro ao analisar.','bot');}
+  ld=false;btn.disabled=false;
+}
+
+function updF(){const v=document.getElementById('produtoAmostra').value;['soja','milho','feijao','arroz','trigo'].forEach(k=>{document.getElementById('fields-'+k).style.display=k===v?'grid':'none';});document.getElementById('resultadoAmostra').style.display='none';}
+
+function analisar(){
+  const prod=document.getElementById('produtoAmostra').value;
+  let tipo='',cor='#2d6a4f',barras=[],alertas=[];
+  if(prod==='soja'){
+    const ard=+document.getElementById('s_ardidos').value||0,que=+document.getElementById('s_queimados').value||0,mof=+document.getElementById('s_mofados').value||0,fer=+document.getElementById('s_fermentados').value||0,ger=+document.getElementById('s_germinados').value||0,dan=+document.getElementById('s_danificados').value||0,ima=+document.getElementById('s_imaturos').value||0,esv=+document.getElementById('s_esverdeados').value||0,ama=+document.getElementById('s_amassados').value||0,qbr=+document.getElementById('s_quebrados').value||0,imp=+document.getElementById('s_impurezas').value||0;
+    const tAv=ard+que+mof+fer+ger+dan+ima,tG=ard+que+mof;
+    if(tG>40){tipo='⛔ Desclassificado';cor='#b71c1c';alertas.push('Defeitos graves >40% — comercialização proibida.');}
+    else if(ard+que<=1&&que<=0.3&&mof<=0.5&&tAv<=8&&esv<=2&&(qbr+ama)<=15&&imp<=1)tipo='✅ Tipo 1 — Grupo I';
+    else if(ard+que<=2&&que<=1&&mof<=1.5&&tAv<=15&&esv<=4&&(qbr+ama)<=30&&imp<=1)tipo='✅ Tipo 2 — Grupo I';
+    else if(ard+que<=4&&mof<=6&&tAv<=30&&esv<=8&&qbr<=8&&imp<=1)tipo='⚠️ Padrão Básico — Grupo II';
+    else{tipo='🚫 Fora do Padrão Básico';cor='#e65100';}
+    barras=[{l:'Ardidos+Queimados',v:ard+que,max:4},{l:'Mofados',v:mof,max:6},{l:'Total Avariados',v:tAv,max:30},{l:'Esverdeados',v:esv,max:8},{l:'Quebrados+Amassados',v:qbr+ama,max:30},{l:'Impurezas',v:imp,max:1}];
+  }else if(prod==='milho'){
+    const ard=+document.getElementById('m_ardidos').value||0,mof=+document.getElementById('m_mofados').value||0,fer=+document.getElementById('m_fermentados').value||0,ger=+document.getElementById('m_germinados').value||0,ges=+document.getElementById('m_gessados').value||0,cho=+document.getElementById('m_chochos').value||0,car=+document.getElementById('m_carunchados').value||0,qbr=+document.getElementById('m_quebrados').value||0,imp=+document.getElementById('m_impurezas').value||0;
+    const tAv=ard+mof+fer+ger+ges+cho;
+    if(ard>5||tAv>20||car>8){tipo='⛔ Desclassificado/Fora de Tipo';cor='#b71c1c';}
+    else if(ard<=1&&tAv<=6&&qbr<=3&&imp<=1&&car<=2)tipo='✅ Tipo 1';
+    else if(ard<=2&&tAv<=10&&qbr<=4&&imp<=1.5&&car<=3)tipo='✅ Tipo 2';
+    else if(ard<=3&&tAv<=15&&qbr<=5&&imp<=2&&car<=4)tipo='⚠️ Tipo 3';
+    else{tipo='🚫 Fora de Tipo';cor='#e65100';}
+    if(car>0)alertas.push('Carunchados detectados — verificar pragas de armazenamento.');
+    barras=[{l:'Ardidos',v:ard,max:3},{l:'Total Avariados',v:tAv,max:15},{l:'Carunchados',v:car,max:4},{l:'Quebrados',v:qbr,max:5},{l:'Impurezas',v:imp,max:2}];
+  }else if(prod==='feijao'){
+    if(document.getElementById('f_insetos').value==='sim'){tipo='⛔ Desclassificado';cor='#b71c1c';alertas.push('Insetos vivos: tolerância ZERO — desclassificado imediatamente.');}
+    else{
+      const mof=+document.getElementById('f_mofados').value||0,ard=+document.getElementById('f_ardidos').value||0,ger=+document.getElementById('f_germinados').value||0,car=+document.getElementById('f_carunchados').value||0,dan=+document.getElementById('f_danificados').value||0,ima=+document.getElementById('f_imaturos').value||0,qbr=+document.getElementById('f_quebrados').value||0;
+      const tot=mof+ard+ger+car+dan+ima+qbr;
+      if(tot<=4)tipo='✅ Tipo 1';else if(tot<=8)tipo='✅ Tipo 2';else if(tot<=12)tipo='⚠️ Tipo 3';else{tipo='🚫 Fora de Tipo';cor='#e65100';}
+      barras=[{l:'Defeitos Graves',v:mof+ard+ger,max:4},{l:'Carunchados',v:car,max:4},{l:'Total Defeitos',v:tot,max:12}];
+    }
+  }else if(prod==='arroz'){
+    const sub=document.getElementById('a_subtipo').value,qbr=+document.getElementById('a_quebrados').value||0,ges=+document.getElementById('a_gessados').value||0,ard=+document.getElementById('a_ardidos').value||0,man=+document.getElementById('a_manchados').value||0,mof=+document.getElementById('a_mofados').value||0,ama=+document.getElementById('a_amarelos').value||0,imp=+document.getElementById('a_impurezas').value||0;
+    const tDef=mof+ard+ama+man+ges;
+    if(sub==='casca'){tipo=qbr<=2&&tDef<=8&&imp<=1?'✅ Tipo 1 — Em Casca':'⚠️ Tipo 2 — Em Casca';}
+    else if(sub==='parboilizado'){if(qbr<=5&&tDef<=6)tipo='✅ Tipo 1 — Parboilizado';else if(qbr<=15&&tDef<=12)tipo='✅ Tipo 2 — Parboilizado';else if(qbr<=25&&tDef<=20)tipo='⚠️ Tipo 3 — Parboilizado';else{tipo='🚫 Fora de Tipo';cor='#e65100';}}
+    else{if(qbr<=5&&ges<=10&&tDef<=7)tipo='✅ Tipo 1 — Beneficiado';else if(qbr<=15&&ges<=20&&tDef<=14)tipo='✅ Tipo 2 — Beneficiado';else if(qbr<=25&&ges<=30&&tDef<=20)tipo='⚠️ Tipo 3 — Beneficiado';else{tipo='🚫 Fora de Tipo';cor='#e65100';}}
+    barras=[{l:'Quebrados',v:qbr,max:25},{l:'Gessados',v:ges,max:30},{l:'Total Defeitos',v:tDef,max:20},{l:'Impurezas',v:imp,max:1}];
+  }else if(prod==='trigo'){
+    const ard=+document.getElementById('t_ardidos').value||0,mof=+document.getElementById('t_mofados').value||0,ger=+document.getElementById('t_germinados').value||0,cho=+document.getElementById('t_chochos').value||0,qbr=+document.getElementById('t_quebrados').value||0,ph=+document.getElementById('t_ph').value||0,imp=+document.getElementById('t_impurezas').value||0;
+    const tAM=ard+mof;
+    if((ph>0&&ph<70)||tAM>2||ger>3){tipo='🚫 Fora de Tipo / Abaixo do Padrão';cor='#e65100';}
+    else if((ph>=78||ph===0)&&tAM<=0.5&&ger<=0.5&&cho<=1&&qbr<=1&&imp<=1)tipo='✅ Tipo 1';
+    else if(ph>=75&&tAM<=1&&ger<=1.5&&cho<=2&&qbr<=2&&imp<=1.5)tipo='✅ Tipo 2';
+    else if(ph>=70&&tAM<=2&&ger<=3&&cho<=4&&qbr<=3&&imp<=2)tipo='⚠️ Tipo 3';
+    else{tipo='🚫 Fora de Tipo';cor='#e65100';}
+    if(ph>0&&ph<75)alertas.push('Peso hectolitro baixo — baixa qualidade de moagem.');
+    barras=[{l:'Peso Hectolitro',v:ph,max:78},{l:'Ardidos+Mofados',v:tAM,max:2},{l:'Germinados',v:ger,max:3},{l:'Quebrados',v:qbr,max:3},{l:'Impurezas',v:imp,max:2}];
+  }
+  const sel=document.getElementById('produtoAmostra');const norma=sel.options[sel.selectedIndex].text;
+  const el=document.getElementById('resultadoAmostra');el.style.display='block';
+  const bH=barras.map(b=>{const pct=Math.min((b.v/Math.max(b.max*1.5,.1))*100,100);const cls=b.v===0?'ok':b.v<=b.max?'ok':b.v<=b.max*1.2?'warn':'bad';return `<div class="rbar-item"><div class="rbar-label"><span>${b.l}</span><span style="font-weight:600">${b.v.toFixed(1)}% <span style="font-weight:400;opacity:.6">/ lim. ${b.max}%</span></span></div><div class="rbar-track"><div class="rbar-fill ${cls}" style="width:${pct.toFixed(1)}%"></div></div></div>`;}).join('');
+  const aH=alertas.map(a=>`<div class="aviso">⚠️ ${a}</div>`).join('');
+  let rt=`GrãoCerto v3.0 — LORD Serviços e Treinamentos\nProduto: ${norma}\nResultado: ${tipo}\n`;barras.forEach(b=>{rt+=`${b.l}: ${b.v.toFixed(1)}% (lim. ${b.max}%)\n`;});rt+=`\nAnálise orientativa. Nilson Andrade — Classificador Credenciado MAPA`;
+  el.innerHTML=`<div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--c3)">RESULTADO — GRÃOCERTO v3.0</div><div class="rtipo" style="color:${cor}">${tipo}</div><div style="margin:7px 0">${bH}</div>${aH}<div class="aviso" style="background:var(--bg);border-color:var(--b2);color:var(--c3);margin-top:6px"><strong>Base:</strong> ${norma}<br>ℹ️ LORD Serviços e Treinamentos • Nilson Andrade</div><button class="btn-copy" id="copyBtn" onclick="cpR(\`${rt.replace(/`/g,"'")}\`)">📋 Copiar resultado</button>`;
+  salvarHist('amostra',norma.split('—')[0].trim(),'Análise de amostra',tipo);
+}
+
+function cpR(txt){navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✅ Copiado!';setTimeout(()=>{b.innerHTML='📋 Copiar resultado';},2000);});}
+
+function calcDesconto(){
+  const peso=+document.getElementById('calc_peso').value||0,preco=+document.getElementById('calc_preco').value||0;
+  const umid=+document.getElementById('calc_umidade').value||0,umbase=+document.getElementById('calc_umbase').value||14;
+  const imp=+document.getElementById('calc_imp').value||0,impbase=+document.getElementById('calc_impbase').value||1;
+  const def=+document.getElementById('calc_defeitos').value||0,defbase=+document.getElementById('calc_defbase').value||2;
+  if(!peso||!preco){alert('Informe o peso bruto e o preço por saca.');return;}
+  const sacas=peso/60,valorB=sacas*preco;
+  let dU=0,dI=0,dD=0,kgU=0,kgI=0,kgD=0;
+  if(umid>umbase){const ex=(umid-umbase)/(100-umbase);kgU=peso*ex;dU=(kgU/60)*preco;}
+  if(imp>impbase){kgI=peso*((imp-impbase)/100);dI=(kgI/60)*preco;}
+  if(def>defbase){kgD=peso*((def-defbase)/100);dD=(kgD/60)*preco;}
+  const tD=dU+dI+dD,pL=peso-kgU-kgI-kgD,vL=valorB-tD;
+  const el=document.getElementById('calc_result');el.style.display='block';
+  el.innerHTML=`<div class="calc-result-row"><span class="calc-result-label">Peso bruto</span><span class="calc-result-val">${peso.toLocaleString('pt-BR')} kg</span></div>
+  <div class="calc-result-row"><span class="calc-result-label">Sacas (60kg)</span><span class="calc-result-val">${sacas.toFixed(2)}</span></div>
+  <div class="calc-result-row"><span class="calc-result-label">Valor bruto</span><span class="calc-result-val">R$ ${valorB.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+  ${dU>0?`<div class="calc-result-row"><span class="calc-result-label desc-item">(-) Umidade (${(umid-umbase).toFixed(1)}pp)</span><span class="calc-result-val desc-item">- R$ ${dU.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>`:''}
+  ${dI>0?`<div class="calc-result-row"><span class="calc-result-label desc-item">(-) Impurezas (${(imp-impbase).toFixed(1)}pp)</span><span class="calc-result-val desc-item">- R$ ${dI.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>`:''}
+  ${dD>0?`<div class="calc-result-row"><span class="calc-result-label desc-item">(-) Defeitos (${(def-defbase).toFixed(1)}pp)</span><span class="calc-result-val desc-item">- R$ ${dD.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>`:''}
+  <div class="calc-result-row"><span class="calc-result-label">Peso líquido est.</span><span class="calc-result-val">${pL.toFixed(0)} kg</span></div>
+  <div class="calc-result-row"><span>💰 Valor líquido est.</span><span>R$ ${vL.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>`;
+  salvarHist('desconto','Calculadora',`Peso ${peso}kg, Umidade ${umid}%, Imp ${imp}%, Def ${def}%`,`Valor líquido: R$ ${vL.toLocaleString('pt-BR',{minimumFractionDigits:2})}`);
+}
+
+function setRefTab(t){const ts=['soja','milho','feijao','arroz','trigo','defeitos'];document.querySelectorAll('.ref-tab').forEach((b,i)=>b.classList.toggle('active',ts[i]===t));document.querySelectorAll('.ref-content').forEach(c=>c.classList.remove('active'));document.getElementById('ref-'+t).classList.add('active');}
+
+function renderGloss(lista){
+  const el=document.getElementById('glossLista');
+  if(!lista.length){el.innerHTML='<div class="gloss-empty">Nenhum termo encontrado.</div>';return;}
+  el.innerHTML=lista.map((g,i)=>`<div class="gloss-item" onclick="this.classList.toggle('open')">
+    <div class="gloss-header"><span class="gloss-termo">${g.t}</span><div style="display:flex;align-items:center;gap:6px"><span class="gloss-cat ${g.cat}">${g.c}</span><span class="gloss-arrow">▶</span></div></div>
+    <div class="gloss-def">${g.d}</div>
+  </div>`).join('');
+}
+
+function filtrarGloss(q){const f=GLOSS.filter(g=>g.t.toLowerCase().includes(q.toLowerCase())||g.d.replace(/<[^>]*>/g,'').toLowerCase().includes(q.toLowerCase()));renderGloss(f);}
+
+function renderFaq(cat){
+  const el=document.getElementById('faqLista');
+  const lista=cat==='todos'?FAQS:FAQS.filter(f=>f.cat===cat);
+  el.innerHTML=lista.map(f=>`<div class="faq-item" onclick="this.classList.toggle('open')">
+    <div class="faq-header"><span class="faq-q">${f.q}</span><span class="faq-arrow">▶</span></div>
+    <div class="faq-resp">${f.r}</div>
+  </div>`).join('');
+}
+
+function filtrarFaq(btn,cat){document.querySelectorAll('.faq-cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderFaq(cat);}
+
+function salvarHist(tipo,cultura,pergunta,resposta){
+  const now=new Date();const hora=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  hist.unshift({tipo,cultura,pergunta,resposta,hora});if(hist.length>25)hist.pop();renderHist();
+}
+
+function renderHist(){
+  const el=document.getElementById('historicoLista');
+  if(!hist.length){el.innerHTML='<div class="hist-empty">Nenhuma análise realizada ainda.</div>';return;}
+  const icons={consulta:'💬',amostra:'🧪',imagem:'📷',desconto:'🧮'};
+  el.innerHTML=hist.map(h=>`<div class="hist-item"><div class="hist-header"><span class="hist-cultura">${icons[h.tipo]||'📋'} ${h.cultura}</span><span class="hist-time">${h.hora}</span></div><div class="hist-tipo" style="color:${h.tipo==='amostra'?'var(--v2)':h.tipo==='desconto'?'var(--ou)':'var(--c2)'}">${(h.tipo==='amostra'||h.tipo==='desconto')?h.resposta.substring(0,50):'Consulta técnica'}</div><div class="hist-preview">${h.pergunta.substring(0,65)}${h.pergunta.length>65?'...':''}</div></div>`).join('');
+}
+
+function limparHistorico(){hist=[];renderHist();}
+function cm(){document.getElementById('upModal').classList.remove('open');}
+function cw(){window.open('https://wa.me/5566996924191?text=Olá! Tenho interesse no GrãoCerto — plano Empresa.','_blank');}
+
+renderQBtns();
+renderGloss(GLOSS);
+renderFaq('todos');
+</script>
+</body>
+</html>
